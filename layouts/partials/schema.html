@@ -33,6 +33,14 @@
       {{- end -}}
     {{- end -}}
   {{- end -}}
+  {{- $authorImage := "" }}
+  {{ with $author.image }}
+    {{- if or (strings.HasPrefix . "http:") (strings.HasPrefix . "https:") }}
+      {{- $authorImage = resources.GetRemote . }}
+    {{- else }}
+      {{- $authorImage = resources.Get . }}
+    {{- end }}
+  {{- end }}
   <script type="application/ld+json">
   [{
     "@context": "https://schema.org",
@@ -45,8 +53,8 @@
     "url" : {{ .Permalink }},
     "author" : {
       "@type": "Person",
-      "name": "{{ $author.name | safeJS }}"{{ with $author.image }},
-      "image": {{ . | absURL }}{{ end }}{{ if $sameAs }},
+      "name": "{{ $author.name | safeJS }}"{{ with $authorImage }},
+      "image": {{ $authorImage.RelPermalink }}{{ end }}{{ if $sameAs }},
       "sameAs": [{{ range $i, $u := $sameAs }}{{ if $i }}, {{ end }}{{ $u }}{{ end }}]{{ end }}
     },
     {{ with .PublishDate }}"copyrightYear": "{{ .Format "2006" }}",{{ end }}
